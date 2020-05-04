@@ -24,7 +24,7 @@ router.get("/", (req, res, next) => {
             name: doc.name,
             price: doc.price,
             _id: doc._id,
-            request: {
+            request: { 
               type: 'GET',
               url: 'http://localhost:3000/products' + doc._id
             }
@@ -73,7 +73,7 @@ router.post("/", (req, res, next) => {
           _id: result._id,
           request: {
             type: 'POST',
-            url: "http://localhost:3000/products/"
+            url: "http://localhost:3000/products/"+ result._id
           }
         }
       });
@@ -103,11 +103,18 @@ router.get("/:productId", (req, res, next) => {
   // }
 
   Product.findById(id)
+  .select('name price _id')
     .exec()
     .then((doc) => {
       console.log("From Database", doc);
       if (doc) {
-        res.status(200).json(doc);
+        res.status(200).json({
+          product: doc,
+          request: {
+            type: 'GET',
+            url: 'http://localhost/products'
+          }
+        });
       } else {
         res.status(404).json({ message: "No valid Product Id found" });
       }
@@ -129,10 +136,16 @@ router.patch("/:productId", (req, res, next) => {
     .exec()
     .then(result => {
       console.log(result);
-      res.status(200).json(result);
+      res.status(200).json({
+        messsage: 'Product updated',
+        request: {
+          type: 'GET',
+          url: 'http://localhost:3000/products/' + id
+        }
+      });
     })
     .catch((err) => {
-      console.log(err);
+      console.log(err); 
       res.status(500).json({
         error: err,
       });
